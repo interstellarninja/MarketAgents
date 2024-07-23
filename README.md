@@ -126,18 +126,12 @@ Stores historical market data:
 - **update_market_trends()**: Updates market trends based on new data.
 - **get_relevant_market_data()**: Retrieves relevant market data.
 
-### PricingStrategy
-Defines the strategy for setting prices based on costs and market conditions.
-
 ### InformationBoard
 Public board for broadcasting messages:
 - **posts**: List of posted messages.
 - **add_post()**: Adds a post to the board.
 - **get_relevant_posts()**: Retrieves relevant posts for an agent.
 - **retrieve_information()**: Retrieves general information from the board.
-
-### Expression
-Handles evaluation of expressions in ACL messages.
 
 ### AgentSocialNetwork
 Models the social network of agents:
