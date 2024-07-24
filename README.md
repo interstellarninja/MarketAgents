@@ -15,7 +15,7 @@ We anchor our simulation environment to the theoretical framework for modeling h
 
 A microeconomic system is a framework for modeling economic interactions between agents. It consists of two main components: an environment and an institution. The environment defines the characteristics of the economic agents, including their preferences, endowments, and technologies. The institution specifies the rules governing how agents can communicate and exchange goods or services. This framework allows economists to study how different environmental conditions and institutional rules impact economic outcomes and agent behavior.
 
-```
+```mermaid
 classDiagram
     class Environment {
         +agents: List[Agent]
@@ -125,7 +125,7 @@ Large Language Model (LLM) agents represent the cutting edge in agent-based mode
 
 ## Institution
 
-The `Institution` class represents the rules, norms, and structures that govern the economic system in the simulation. It encompasses various aspects of the economic environment that influence agent behavior and market dynamics.
+The `Institution` class represents the rules, norms, and structures that govern the economic system in the simulation. It encompasses various aspects of the economic environment that influence agent behavior and market dynamics such as monetary policy, fiscal policy and regulatory framework. 
 
 Institution defines the "rules of the game" under which agents interact and markets operate. They encompass formal rules (like laws and regulations) and informal norms that shape economic behavior. In the context of double auctions and agent-based modeling, institutions determine critical aspects such as:
 
