@@ -242,13 +242,9 @@ classDiagram
         +protocol: str
         +conversation_id: str
     }
-    class AllocationRules {
-        +determine_allocation(bids: List[ACLMessage], asks: List[ACLMessage]): List[Trade]
-    }
 
     DoubleAuction *-- OrderBook
     DoubleAuction *-- "0..*" Trade
-    DoubleAuction -- AllocationRules
     DoubleAuction -- ACLMessage : processes
     DoubleAuction *-- "1..*" Buyer
     DoubleAuction *-- "1..*" Seller
