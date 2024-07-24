@@ -126,7 +126,19 @@ Depending on the resolution the agents need, we should use a fast indexed search
 3. *social_history:* {p2p chats with other agents} {chatroom/messageboard interactions}
 4. *activity_log:* {sims sequence of their mundane tasks} {recent_actions} {needs_stats} {mood}
 
-Has four distinct memory logs, masking some context while emphasising others through prompting. 
+Has four distinct memory logs, masking some context while emphasising others through prompting.
+
+```mermaid
+graph TD
+    subgraph "Memory Module"
+        A[inner_monologue] --> B[finance_history]
+        A --> C[social_history]
+        A --> D[activity_log]
+        B --> A
+        C --> A
+        D --> A
+    end
+```
 
 ### Financial Observor/and or Environment Context Memory:
 
