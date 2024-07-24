@@ -136,25 +136,23 @@ Has four distinct memory logs, masking some context while emphasising others thr
 Has two memory tracks their previous observations and the holistic market overview.  
 
 ### Trackables:
-```
-personal_trade_history: A list of trades the agent has participated in.
-commodity_price_history: Historical prices for each commodity the agent has interacted with.
-past_decisions: A record of decisions made, including context and outcomes.
-strategy_performance: Metrics on how well different strategies have performed.
-social_interactions: A record of interactions with other agents.
-market_beliefs: The agent's beliefs about different commodities in the market.
-learning_experiences: Specific scenarios where the agent has learned something.
-utility_history: A record of the agent's utility over time.
-endowment_history: How the agent's endowment has changed over time.
-message_history: A record of messages sent and received.
-global_price_history: Historical prices for all commodities in the market.
-all_trades: A record of all trades that have occurred in the market.
-market_trends: Overall trends for each commodity.
-agent_behaviors: Summary of behaviors for each agent in the market.
-institution_changes: Record of changes to market institutions and their impacts.
-global_supply_demand: Supply and demand information for each commodity.
-economic_indicators: Various economic indicators relevant to the market.
-```
+- `personal_trade_history: A list of trades the agent has participated in`
+- `commodity_price_history: Historical prices for each commodity the agent has interacted with`
+- `past_decisions: A record of decisions made, including context and outcomes`
+- `strategy_performance: Metrics on how well different strategies have performed`
+- `social_interactions: A record of interactions with other agents`
+- `market_beliefs: The agent's beliefs about different commodities in the market`
+- `learning_experiences: Specific scenarios where the agent has learned something`
+- `utility_history: A record of the agent's utility over time`
+- `endowment_history: How the agent's endowment has changed over time`
+- `message_history: A record of messages sent and received`
+- `global_price_history: Historical prices for all commodities in the market`
+- `all_trades: A record of all trades that have occurred in the market`
+- `market_trends: Overall trends for each commodity`
+- `agent_behaviors: Summary of behaviors for each agent in the market`
+- `institution_changes: Record of changes to market institutions and their impacts`
+- `global_supply_demand: Supply and demand information for each commodity`
+- `economic_indicators: Various economic indicators relevant to the market`
 
 ### Information Board
 The Information Board serves as a centralized repository for economic news and statistics, simulating the dissemination of public information within the economy. This component plays a crucial role in the MarketAgents framework by:
