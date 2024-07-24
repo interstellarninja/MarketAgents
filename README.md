@@ -73,6 +73,81 @@ In the context of a multi-agent economic simulation, particularly within a Doubl
 
 ## Example Usage in a Double Auction Framework
 
+```mermaid
+classDiagram
+    class DoubleAuction {
+        +buyers: List[Buyer]
+        +sellers: List[Seller]
+        +order_book: OrderBook
+        +trades: List[Trade]
+        +start_auction()
+        +end_auction()
+        +process_message(message: ACLMessage)
+        +match_orders()
+        +clear_market()
+        +broadcast_market_update()
+    }
+    class OrderBook {
+        +bids: List[ACLMessage]
+        +asks: List[ACLMessage]
+        +add_order(order: ACLMessage)
+        +remove_order(order: ACLMessage)
+        +get_best_bid(): ACLMessage
+        +get_best_ask(): ACLMessage
+        +update_order_book()
+    }
+    class Trade {
+        +buyer: Buyer
+        +seller: Seller
+        +commodity: Commodity
+        +price: float
+        +quantity: int
+        +timestamp: datetime
+    }
+    class Buyer {
+        +induced_value: float
+        +income: float
+        +demographic_characteristics: Dict
+        +generate_bid(): ACLMessage
+        +calculate_utility(): float
+    }
+    class Seller {
+        +induced_cost: float
+        +production_function: Function
+        +capital: float
+        +specialization: str
+        +pricing_strategy: PricingStrategy
+        +generate_ask(): ACLMessage
+        +optimize_production(): float
+    }
+    class ACLMessage {
+        +performative: str
+        +sender: Agent
+        +receiver: Agent
+        +content: Expression
+        +reply_with: str
+        +in_reply_to: str
+        +language: str
+        +ontology: str
+        +protocol: str
+        +conversation_id: str
+    }
+    class AllocationRules {
+        +determine_allocation(bids: List[ACLMessage], asks: List[ACLMessage]): List[Trade]
+    }
+
+    DoubleAuction *-- OrderBook
+    DoubleAuction *-- "0..*" Trade
+    DoubleAuction -- AllocationRules
+    DoubleAuction -- ACLMessage : processes
+    DoubleAuction *-- "1..*" Buyer
+    DoubleAuction *-- "1..*" Seller
+    Buyer -- ACLMessage : generates
+    Seller -- ACLMessage : generates
+    Trade -- Buyer
+    Trade -- Seller
+```
+
 In a Double Auction framework, ACL messages facilitate various market interactions, such as submitting bids and offers, negotiating trades, and disseminating market information. Here is a typical example of how ACL messages are used in this context:
 
 1. **Bid Submission**:
