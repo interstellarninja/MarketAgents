@@ -1,144 +1,377 @@
 # MarketAgents
 Agent based market simulation
 
-MarketAgents is a microeconomic simulation framework designed to model agent-based market interactions. It includes features for simulating double auctions, tracking market dynamics, and modeling agent behavior. The framework is built to be extensible and adaptable for various economic experiments.
+MarketAgents is a microeconomic simulation framework designed to model agent-based market interactions. It includes features for simulating double auctions, tracking market dynamics, and modeling agent behavior. The framework is built to be extensible and adaptable for various economic experiments. This library is designed for implementing turn-based Double Auction simulations with literate economic agents capable of reading/writing news and communicating with each other. The library aims to study the role of news and information processing in the pricing dynamics of simulated virtual financial markets. Traditional economic models have struggled to acknowledge the role of information networks in price formation beyond simplistic implementations due to the inability to model human communication using natural language. The latest generation of LLMs now makes this possible.
 
-## Components
+This library seeks to merge and validate formal economic models of trade and learning with recent agent-based modeling capabilities. Large language models can implement, model, and formalize three fundamental aspects of realistic economic agents that have been known weaknesses of traditional economic models:
+
+1. Information and communication beyond prices
+2. In-context learning mimicking human behavior exhibited in experiments and actual markets
+3. Bounded rationality through context overflow management and prompting choices
+
+We anchor our simulation environment to the theoretical framework for modeling human experiments as Microeconomic Systems proposed by Nobel laureate Vernon L. Smith (1982). This framework's extensive use of information theory terminology offers an immediate connection to modern LLM theory and practice.
+
+## Microeconomic Systems
+
+A microeconomic system is a framework for modeling economic interactions between agents. It consists of two main components: an environment and an institution. The environment defines the characteristics of the economic agents, including their preferences, endowments, and technologies. The institution specifies the rules governing how agents can communicate and exchange goods or services. This framework allows economists to study how different environmental conditions and institutional rules impact economic outcomes and agent behavior.
+
+
+## Double Auction
+
+Double auctions are a specific type of microeconomic system commonly used in experimental economics and financial markets. In a double auction, buyers and sellers can simultaneously submit bids and offers for a single type of good. The environment typically consists of separate buyer and seller populations, each with their own induced values or costs for the good. The institutional rules allow participants to freely announce bids and offers, with trades occurring when a bid meets or exceeds an offer. This structure facilitates price discovery and efficient allocation of resources, making double auctions a powerful tool for studying market dynamics and testing economic theories.
+
+
+| Proposition | Description |
+|-------------|-------------|
+| 4 | Allocations and prices in DA converge to levels near the competitive equilibrium (C.E.) prediction. This convergence is rapid, occurring in three to four trading periods or less with experienced subjects. |
+| 5 | Convergence to C.E. prices and allocations occurs with as few as six to eight agents, and as few as two sellers. |
+| 6 | Complete information on the theoretical supply and demand conditions is neither necessary nor sufficient for the rapid convergence property in DA. |
+| 7 | Price convergence tends to be from above (below) the C.E. price when consumer's surplus is greater (smaller) than producer's surplus. |
+| 8 | Experiments with one seller and five buyers do not achieve monopoly outcomes in DA, although some replications achieve the C.E. outcome. Buyers tend to withhold purchases, giving the seller a reduced profit. |
+| 9 | Experiments with four buyers and four sellers where sellers (or buyers) are allowed to "conspire" do not converge to the monopoly (or monopsony) outcome in DA; neither do they seem to converge dependably to the C.E. |
+| 10 | Binding price ceilings (floors) in DA yield contract price sequences which converge to the ceiling price from below (above). Non-binding price controls affect price dynamics but ultimately converge to C.E. |
+| 11 | Asset markets with eight or nine agents in DA converge slowly toward the C.E. (rational expectations) price and efficiency. Convergence is hastened by introducing a futures market. |
+| 12 | Asset markets with nine or twelve agents in DA, where some agents have insider information, converge toward the C.E. (rational expectations) price and efficiency. |
+
+The table above summarizes key propositions from Vernon Smith's experimental studies on double auctions. These propositions highlight the robustness and efficiency of double auction markets under various conditions. Our aim is to replicate and potentially extend these findings using simulated agents, exploring how different levels of agent sophistication impact market dynamics and outcomes.
+
+## Agents
+
+n our simulation, we implement three distinct types of agents, each representing a different level of sophistication in decision-making and information processing. This approach allows us to compare market outcomes across a spectrum of agent capabilities, from the simplest random behavior to complex, language-model-driven strategies. By doing so, we can investigate how different degrees of agent intelligence and information processing affect market efficiency, price discovery, and the replication of empirical findings from human experiments. The three agent types are designed to capture key aspects of economic decision-making, from baseline random behavior to sophisticated, human-like reasoning.
+
+### Zero Intelligence Agents
+
+Zero Intelligence (ZI) agents represent the simplest form of market participants. These agents operate without strategic reasoning or learning capabilities. Instead, they generate random bids or asks within their budget constraints. ZI agents serve as a baseline model, demonstrating the minimum level of "intelligence" required for market function. Despite their simplicity, studies have shown that markets populated by ZI agents can still achieve near-efficient outcomes, highlighting the power of market institutions in guiding allocation decisions. These agents are particularly useful for isolating the effects of market structure from individual strategic behavior.
+
+### Lookback Bayesian Agents
+
+Lookback Bayesian agents introduce a level of strategic reasoning based on historical market data. These agents maintain a prior distribution of beliefs about market conditions and update these beliefs as new information becomes available. They make decisions by calculating expected values based on their current beliefs, effectively learning from past market outcomes. This approach allows for more sophisticated trading strategies that adapt to changing market conditions. Lookback Bayesian agents can capture phenomena such as price trend following or mean reversion, depending on their specific implementation. Their behavior more closely mimics real-world traders who use historical data to inform their decisions.
+
+### LLM Agents
+
+Large Language Model (LLM) agents represent the cutting edge in agent-based modeling for economic simulations. These agents leverage the power of language models to process complex information, learn in context, and make nuanced decisions. LLM agents can read and generate human-like messages, allowing for rich information exchange beyond simple price signals. Their working memory and history window can be adjusted to model different levels of bounded rationality. By controlling compression and summarization levels, we can simulate varying degrees of information processing capabilities. LLM agents can potentially exhibit sophisticated behaviors such as strategic communication, complex reasoning about market conditions, and adaptive learning that more closely resembles human decision-making in real markets.
+
+# ACL Message Protocol in Multi-Agent Economic Simulation
+
+In the context of a multi-agent economic simulation, particularly within a Double Auction framework, the Agent Communication Language (ACL) protocol plays a crucial role in facilitating interactions among agents. The ACL protocol, as defined by the Foundation for Intelligent Physical Agents (FIPA), provides a standardized method for agents to exchange information and perform actions in a consistent and interpretable manner.
+
+## Key Components of ACL Messages
+
+1. **Performative**: This field specifies the type of communicative act being performed, such as a request, inform, propose, or confirm. Each performative represents a different intention behind the message, guiding the receiving agent's response.
+
+2. **Sender and Receiver**: These fields identify the agents involved in the communication. The sender field specifies the agent that initiates the message, while the receiver field indicates the intended recipient.
+
+3. **Content**: The content field contains the actual information or request being communicated. This can be a simple string, a structured data format, or a complex expression in a formal language or ontology.
+
+4. **Reply With and In Reply To**: These fields are used to manage conversations. The reply_with field provides a unique identifier for the message, which can be referenced by the in_reply_to field in subsequent messages to link replies to their original messages.
+
+5. **Language and Ontology**: These fields define the syntax and semantics of the content. The language field specifies the formal language used to represent the content, while the ontology field defines the domain-specific vocabulary and concepts.
+
+6. **Protocol**: This field indicates the interaction protocol being followed, ensuring that both agents understand the expected sequence of communicative acts.
+
+7. **Conversation ID**: This field uniquely identifies a conversation thread, allowing agents to track and manage multiple ongoing interactions simultaneously.
+
+## Example Usage in a Double Auction Framework
+
+In a Double Auction framework, ACL messages facilitate various market interactions, such as submitting bids and offers, negotiating trades, and disseminating market information. Here is a typical example of how ACL messages are used in this context:
+
+1. **Bid Submission**:
+   * **Performative**: `PROPOSE`
+   * **Sender**: `BuyerAgent1`
+   * **Receiver**: `AuctioneerAgent`
+   * **Content**: `{"commodity": "gold", "price": 1500, "quantity": 10}`
+   * **Language**: `JSON`
+   * **Ontology**: `MarketOntology`
+   * **Protocol**: `DoubleAuctionProtocol`
+   * **Conversation ID**: `conv1`
+
+2. **Offer Submission**:
+   * **Performative**: `PROPOSE`
+   * **Sender**: `SellerAgent1`
+   * **Receiver**: `AuctioneerAgent`
+   * **Content**: `{"commodity": "gold", "price": 1550, "quantity": 5}`
+   * **Language**: `JSON`
+   * **Ontology**: `MarketOntology`
+   * **Protocol**: `DoubleAuctionProtocol`
+   * **Conversation ID**: `conv1`
+
+3. **Trade Confirmation**:
+   * **Performative**: `ACCEPT_PROPOSAL`
+   * **Sender**: `AuctioneerAgent`
+   * **Receiver**: `BuyerAgent1, SellerAgent1`
+   * **Content**: `{"commodity": "gold", "price": 1525, "quantity": 5}`
+   * **Language**: `JSON`
+   * **Ontology**: `MarketOntology`
+   * **Protocol**: `DoubleAuctionProtocol`
+   * **Conversation ID**: `conv1`
+
+4. **Market Update**:
+   * **Performative**: `INFORM`
+   * **Sender**: `AuctioneerAgent`
+   * **Receiver**: `AllAgents`
+   * **Content**: `{"update": "new_trade", "commodity": "gold", "price": 1525, "quantity": 5}`
+   * **Language**: `JSON`
+   * **Ontology**: `MarketOntology`
+   * **Protocol**: `DoubleAuctionProtocol`
+   * **Conversation ID**: `market_update1`
+
+## CONTEXT MEMORIES FOR PIPING INTO AGENT PROMPTS
+
+Depending on the resolution the agents need, we should use a fast indexed search for fast recall of distant memories.
+
+### Agent Context Memory:
+
+1. *inner_monologue:* reflections on {activity_log} their {stats} and {mood}. reassess current {goals}.
+2. *finance_history:* {transaction_history} {account balance} {assets}
+3. *social_history:* {p2p chats with other agents} {chatroom/messageboard interactions}
+4. *activity_log:* {sims sequence of their mundane tasks} {recent_actions} {needs_stats} {mood}
+
+Has four distinct memory logs, masking some context while emphasising others through prompting. 
+
+### Financial Observor/and or Environment Context Memory:
+
+1. *market_history:* {all_trades} {global_price} {global_supply_demand} {economic_indicators}
+2. *observation_history:* {market_trends} {commentary} {agent_behaviour} {market_history} {chatlogs}
+
+Has two memory tracks their previous observations and the holistic market overview.  
+
+### Trackables:
+```
+personal_trade_history: A list of trades the agent has participated in.
+commodity_price_history: Historical prices for each commodity the agent has interacted with.
+past_decisions: A record of decisions made, including context and outcomes.
+strategy_performance: Metrics on how well different strategies have performed.
+social_interactions: A record of interactions with other agents.
+market_beliefs: The agent's beliefs about different commodities in the market.
+learning_experiences: Specific scenarios where the agent has learned something.
+utility_history: A record of the agent's utility over time.
+endowment_history: How the agent's endowment has changed over time.
+message_history: A record of messages sent and received.
+global_price_history: Historical prices for all commodities in the market.
+all_trades: A record of all trades that have occurred in the market.
+market_trends: Overall trends for each commodity.
+agent_behaviors: Summary of behaviors for each agent in the market.
+institution_changes: Record of changes to market institutions and their impacts.
+global_supply_demand: Supply and demand information for each commodity.
+economic_indicators: Various economic indicators relevant to the market.
+```
+
+### Information Board
+The Information Board serves as a centralized repository for economic news and statistics, simulating the dissemination of public information within the economy. This component plays a crucial role in the Litecon framework by:
+
+1. Generating and distributing economic news based on current market states and exogenous factors.
+2. Implementing information dissemination mechanisms with variable reach and impact.
+3. Simulating information decay and relevance scoring to model the changing importance of information over time.
+
+The Information Board allows for the study of how information flow affects market dynamics and agent decision-making, providing a more realistic simulation of information asymmetry and its effects on economic outcomes.
+
+## Core Modules
 
 ### MicroeconomicSystem
-The core class responsible for running the simulation and generating reports. It integrates the `Environment` and `Institution` to manage the overall simulation process.
+The MicroeconomicSystem class serves as the main controller for the simulation, integrating the environment and institution components.
+
+Key Attributes:
+- `environment`: Environment
+- `institution`: Institution
+
+Key Methods:
+- `run_simulation()`
+- `generate_reports()`
 
 ### Environment
-Represents the simulation environment, including:
-- **agents**: A list of `Agent` objects participating in the market.
-- **commodities**: A list of `Commodity` objects available in the market.
-- **time**: The current simulation time.
-- **social_network**: An `AgentSocialNetwork` tracking interactions between agents.
-- **information_board**: An `InformationBoard` for public messages and updates.
+The Environment class represents the economic context in which agents operate.
+
+Key Attributes:
+- `agents`: List[Agent]
+- `commodities`: List[Commodity]
+- `time`: int
+- `social_network`: Graph
+- `information_board`: InformationBoard
 
 ### Institution
-Defines the rules and policies governing the market:
-- **language**: Specifies the communication protocol and valid messages.
-- **allocation_rules**: Rules for determining how resources are allocated.
-- **cost_imputation_rules**: Rules for calculating costs associated with trades.
-- **adjustment_process_rules**: Rules for adjusting the market state over time.
+The Institution class defines the rules and structures governing economic interactions.
+
+Key Attributes:
+- `language`: Language
+- `allocation_rules`: AllocationRules
+- `cost_imputation_rules`: CostImputationRules
+- `adjustment_process_rules`: AdjustmentProcessRules
+- `policy_rate`: float
+- `taxation_policy`: float
+- `business_regulation_index`: float
+- `social_security_index`: float
 
 ### Agent
-The base class for all agents in the simulation:
-- **id**: Unique identifier for the agent.
-- **utility_function**: Function representing the agent's utility.
-- **endowment**: The initial endowment of commodities.
-- **rationality_coefficient**: Parameter defining the agent's rationality.
-- **epsilon**: Parameter for balancing exploration and exploitation.
-- **memory**: A `MarketMemory` object for storing historical market data.
-- **send_message()**: Method to send messages to other agents.
-- **receive_message()**: Method to receive messages from other agents.
-- **make_decision()**: Method for making decisions based on current information.
-- **update_strategy()**: Method to update the agent's strategy.
+The Agent class serves as the base class for economic actors in the simulation.
 
-### Buyer
-Subclass of `Agent` representing buyers:
-- **induced_value**: Value the buyer assigns to a commodity.
-- **income**: The buyer's available income.
-- **demographic_characteristics**: Characteristics influencing buying behavior.
-- **generate_bid()**: Method to generate a bid message.
+Key Attributes:
+- `id`: int
+- `utility_function`: Function
+- `endowment`: Dict[Commodity, float]
+- `rationality_coefficient`: float
+- `epsilon`: float
+- `memory`: MarketMemory
 
-### Seller
-Subclass of `Agent` representing sellers:
-- **induced_cost**: Cost of selling a commodity.
-- **production_function**: Function for producing commodities.
-- **capital**: Available capital for production.
-- **specialization**: Area of expertise or specialization.
-- **pricing_strategy**: Strategy for setting prices.
-- **generate_ask()**: Method to generate an ask message.
+Key Methods:
+- `send_message(message: ACLMessage)`
+- `receive_message(message: ACLMessage)`
+- `make_decision()`
+- `update_strategy()`
+- `learn_from_experience()`
+- `adapt_strategy()`
+
+#### Buyer
+The Buyer class represents agents who purchase commodities.
+
+Key Attributes:
+- `induced_value`: float
+- `income`: float
+- `demographic_characteristics`: Dict
+
+Key Methods:
+- `generate_bid(): ACLMessage`
+- `calculate_utility(): float`
+
+#### Seller
+The Seller class represents agents who sell commodities.
+
+Key Attributes:
+- `induced_cost`: float
+- `production_function`: Function
+- `capital`: float
+- `specialization`: str
+- `pricing_strategy`: PricingStrategy
+
+Key Methods:
+- `generate_ask(): ACLMessage`
+- `optimize_production(): float`
 
 ### Commodity
-Represents market commodities:
-- **id**: Unique identifier for the commodity.
-- **name**: Name of the commodity.
-- **category**: Category of the commodity.
-- **subcategory**: Subcategory of the commodity.
+The Commodity class represents the goods or services traded in the market.
 
-### ACLMessage
-Represents messages exchanged between agents:
-- **performative**: Type of performative (e.g., request, inform).
-- **sender**: The sending agent.
-- **receiver**: The receiving agent.
-- **content**: The content of the message.
-- **reply_with**: Identifier for a reply.
-- **in_reply_to**: Identifier for the original message.
-- **language**: Language used in the message.
-- **ontology**: Ontology of the message.
-- **protocol**: Protocol used for the message.
-- **conversation_id**: Identifier for the conversation.
+Key Attributes:
+- `id`: int
+- `name`: str
+- `category`: str
+- `subcategory`: str
 
-### Language
-Defines the valid messages and protocols for communication between agents.
+### Market Mechanisms
 
-### AllocationRules
-Contains rules for determining how resources are allocated based on bids and asks.
+#### DoubleAuction
+The DoubleAuction class implements the double auction market mechanism.
 
-### CostImputationRules
-Rules for calculating costs associated with trades.
+Key Attributes:
+- `buyers`: List[Buyer]
+- `sellers`: List[Seller]
+- `order_book`: OrderBook
+- `trades`: List[Trade]
 
-### AdjustmentProcessRules
-Rules for adjusting the market state, including start, transition, and stopping rules.
+Key Methods:
+- `start_auction()`
+- `end_auction()`
+- `process_message(message: ACLMessage)`
+- `match_orders()`
+- `clear_market()`
+- `broadcast_market_update()`
 
-### DoubleAuction
-Models the double auction mechanism:
-- **buyers**: List of buyers participating in the auction.
-- **sellers**: List of sellers participating in the auction.
-- **order_book**: Maintains bids and asks for the auction.
-- **trades**: List of trades executed during the auction.
-- **start_auction()**: Starts the auction process.
-- **end_auction()**: Ends the auction process.
-- **process_message()**: Processes incoming messages.
-- **match_orders()**: Matches bids and asks.
-- **clear_market()**: Clears the market at the end of the auction.
-- **broadcast_market_update()**: Broadcasts updates to all agents.
+#### OrderBook
+The OrderBook class manages the list of bids and asks in the market.
 
-### OrderBook
-Maintains a record of bids and asks:
-- **bids**: List of bid messages.
-- **asks**: List of ask messages.
-- **add_order()**: Adds an order to the book.
-- **remove_order()**: Removes an order from the book.
-- **get_best_bid()**: Retrieves the best bid.
-- **get_best_ask()**: Retrieves the best ask.
+Key Attributes:
+- `bids`: List[ACLMessage]
+- `asks`: List[ACLMessage]
 
-### Trade
-Represents a trade between a buyer and a seller:
-- **buyer**: The buyer involved in the trade.
-- **seller**: The seller involved in the trade.
-- **price**: Price of the trade.
-- **quantity**: Quantity traded.
-- **timestamp**: Time of the trade.
+Key Methods:
+- `add_order(order: ACLMessage)`
+- `remove_order(order: ACLMessage)`
+- `get_best_bid(): ACLMessage`
+- `get_best_ask(): ACLMessage`
+- `update_order_book()`
 
-### MarketMemory
-Stores historical market data:
-- **price_history**: History of prices for each commodity.
-- **trade_history**: History of trades.
-- **agent_behavior**: Records of agent behavior and messages.
-- **market_trends**: Current market trends for each commodity.
-- **add_price()**: Adds a price record.
-- **add_trade()**: Adds a trade record.
-- **add_agent_behavior()**: Adds a record of agent behavior.
-- **update_market_trends()**: Updates market trends based on new data.
-- **get_relevant_market_data()**: Retrieves relevant market data.
+### Communication Protocol
 
-### InformationBoard
-Public board for broadcasting messages:
-- **posts**: List of posted messages.
-- **add_post()**: Adds a post to the board.
-- **get_relevant_posts()**: Retrieves relevant posts for an agent.
-- **retrieve_information()**: Retrieves general information from the board.
+#### ACLMessage
+The ACLMessage class implements the FIPA Agent Communication Language specification.
 
-### AgentSocialNetwork
-Models the social network of agents:
-- **graph**: Directed graph of agent interactions.
-- **add_interaction()**: Adds an interaction between agents.
-- **get_interactions()**: Retrieves all interactions.
-- **get_agent_neighbors()**: Retrieves neighbors of a specific agent.
+Key Attributes:
+- `performative`: str
+- `sender`: Agent
+- `receiver`: Agent
+- `content`: Expression
+- `reply_with`: str
+- `in_reply_to`: str
+- `language`: str
+- `ontology`: str
+- `protocol`: str
+- `conversation_id`: str
+
+### Data Collection and Analysis
+
+#### MarketMemory
+The MarketMemory class maintains historical records of market activities.
+
+Key Attributes:
+- `price_history`: Dict[Commodity, List[float]]
+- `trade_history`: List[Trade]
+- `agent_behavior`: Dict[Agent, List[ACLMessage]]
+- `market_trends`: Dict[Commodity, str]
+
+Key Methods:
+- `add_price(commodity: Commodity, price: float)`
+- `add_trade(trade: Trade)`
+- `add_agent_behavior(agent: Agent, message: ACLMessage)`
+- `update_market_trends()`
+- `get_relevant_market_data(context: str): Dict`
+- `log_trade(trade: Trade)`
+
+#### InformationBoard
+The InformationBoard class serves as a centralized repository for economic news and statistics.
+
+Key Attributes:
+- `posts`: List[ACLMessage]
+
+Key Methods:
+- `add_post(post: ACLMessage)`
+- `get_relevant_posts(agent: Agent): List[ACLMessage]`
+- `retrieve_information(): List[str]`
+
+### Additional Components
+
+#### Language
+The Language class defines the valid messages and communication rules.
+
+Key Attributes:
+- `valid_messages`: List[str]
+
+#### AllocationRules
+The AllocationRules class determines how resources are allocated based on market interactions.
+
+Key Methods:
+- `determine_allocation(bids: List[ACLMessage], asks: List[ACLMessage]): List[Trade]`
+
+#### CostImputationRules
+The CostImputationRules class defines how costs are calculated and assigned.
+
+Key Methods:
+- `calculate_costs(trades: List[Trade])`
+
+#### AdjustmentProcessRules
+The AdjustmentProcessRules class governs how the market adjusts over time.
+
+Key Methods:
+- `start_rule()`
+- `transition_rule()`
+- `stopping_rule()`
+
+#### Trade
+The Trade class represents a completed transaction between a buyer and a seller.
+
+Key Attributes:
+- `buyer`: Buyer
+- `seller`: Seller
+- `price`: float
+- `quantity`: int
+- `timestamp`: datetime
 
 ```mermaid
 classDiagram
