@@ -165,6 +165,9 @@ The Information Board serves as a centralized repository for economic news and s
 
 The Information Board allows for the study of how information flow affects market dynamics and agent decision-making, providing a more realistic simulation of information asymmetry and its effects on economic outcomes.
 
+### Social Network Graph
+The social network component in the MarketAgents framework models the interconnections and relationships between agents in the simulated economy. It plays a crucial role in capturing the effects of social interactions, information diffusion, and network externalities on market dynamics. The social network influences how information spreads, how agents form opinions, and how they make economic decisions based on their connections.
+
 ## Core Modules
 
 ### MicroeconomicSystem
@@ -335,6 +338,22 @@ Key Methods:
 - `get_relevant_posts(agent: Agent): List[ACLMessage]`
 - `retrieve_information(): List[str]`
 
+#### ocialNetwork
+The SocialNetwork class represents the social structure of the agents in the simulation. It uses a graph data structure to model connections between agents and provides methods for manipulating and analyzing the network.
+
+Key Attributes:
+- `graph: Graph - The underlying graph structure representing agent connections`
+
+Key Methods:
+
+- `add_agent(agent: Agent): Adds a new agent to the social network`
+- `remove_agent(agent: Agent): Removes an agent from the social network`
+- `add_connection(agent1: Agent, agent2: Agent): Creates a connection between two agents`
+- `remove_connection(agent1: Agent, agent2: Agent): Removes the connection between two agents`
+- `get_neighbors(agent: Agent): List[Agent]: Returns a list of agents connected to the given agent`
+- `calculate_centrality(): Computes various centrality measures for agents in the network`
+- `update_network(): Updates the network structure based on agent interactions and market events`
+
 ### Additional Components
 
 #### Language
@@ -375,12 +394,19 @@ Key Attributes:
 
 ```mermaid
 classDiagram
+    class MicroeconomicSystem {
+        +environment: Environment
+        +institution: Institution
+        +run_simulation()
+        +generate_reports()
+    }
     class Environment {
         +agents: List[Agent]
         +commodities: List[Commodity]
         +time: int
-        +social_network: Graph
+        +social_network: SocialNetwork
         +information_board: InformationBoard
+        +market_mechanism: DoubleAuction
     }
     class Institution {
         +language: Language
@@ -391,12 +417,6 @@ classDiagram
         +taxation_policy: float
         +business_regulation_index: float
         +social_security_index: float
-    }
-    class MicroeconomicSystem {
-        +environment: Environment
-        +institution: Institution
-        +run_simulation()
-        +generate_reports()
     }
     class Agent {
         +id: int
@@ -411,6 +431,16 @@ classDiagram
         +update_strategy()
         +learn_from_experience()
         +adapt_strategy()
+    }
+    class SocialNetwork {
+        +graph: Graph
+        +add_agent(agent: Agent)
+        +remove_agent(agent: Agent)
+        +add_connection(agent1: Agent, agent2: Agent)
+        +remove_connection(agent1: Agent, agent2: Agent)
+        +get_neighbors(agent: Agent): List[Agent]
+        +calculate_centrality()
+        +update_network()
     }
     class Buyer {
         +induced_value: float
@@ -484,6 +514,7 @@ classDiagram
     class Trade {
         +buyer: Buyer
         +seller: Seller
+        +commodity: Commodity
         +price: float
         +quantity: int
         +timestamp: datetime
@@ -497,20 +528,22 @@ classDiagram
         +add_trade(trade: Trade)
         +add_agent_behavior(agent: Agent, message: ACLMessage)
         +update_market_trends()
-        +get_relevant_market_data(context: str)
+        +get_relevant_market_data(context: str): Dict
         +log_trade(trade: Trade)
     }
     class InformationBoard {
         +posts: List[ACLMessage]
         +add_post(post: ACLMessage)
         +get_relevant_posts(agent: Agent): List[ACLMessage]
-        +retrieve_information()
+        +retrieve_information(): List[str]
     }
     MicroeconomicSystem *-- Environment
     MicroeconomicSystem *-- Institution
-    Environment *-- Agent
-    Environment *-- Commodity
+    Environment *-- "1..*" Agent
+    Environment *-- "1..*" Commodity
     Environment *-- InformationBoard
+    Environment *-- DoubleAuction
+    Environment *-- SocialNetwork
     Agent <|-- Buyer
     Agent <|-- Seller
     Agent -- ACLMessage
@@ -519,9 +552,14 @@ classDiagram
     Institution *-- AllocationRules
     Institution *-- CostImputationRules
     Institution *-- AdjustmentProcessRules
-    DoubleAuction *-- Buyer
-    DoubleAuction *-- Seller
     DoubleAuction *-- OrderBook
-    DoubleAuction *-- Trade
-    InformationBoard *-- ACLMessage
+    DoubleAuction *-- "0..*" Trade
+    DoubleAuction -- AllocationRules
+    Trade -- Commodity
+    InformationBoard *-- "0..*" ACLMessage
+    Agent -- InformationBoard: interacts
+    DoubleAuction -- ACLMessage: processes
+    MarketMemory -- Trade: logs
+    MarketMemory -- Commodity: tracks
+    SocialNetwork -- "2..*" Agent: connects
 ```
