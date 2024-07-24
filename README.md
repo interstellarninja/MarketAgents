@@ -569,10 +569,11 @@ classDiagram
     Environment *-- InformationBoard
     Environment *-- DoubleAuction
     Environment *-- SocialNetwork
+    Environment *-- SimulationDatabase
     Agent <|-- Buyer
     Agent <|-- Seller
     Agent -- ACLMessage
-    Agent *-- MarketMemory
+    Agent *-- AgentMemory
     Institution *-- Language
     Institution *-- AllocationRules
     Institution *-- CostImputationRules
@@ -584,8 +585,10 @@ classDiagram
     InformationBoard *-- "0..*" ACLMessage
     Agent -- InformationBoard: interacts
     DoubleAuction -- ACLMessage: processes
-    MarketMemory -- Trade: logs
-    MarketMemory -- Commodity: tracks
+    SimulationDatabase *-- MarketHistory
+    SimulationDatabase *-- "1..*" AgentMemory
+    MarketHistory *-- "0..*" Trade
+    MarketHistory -- Commodity: tracks
     SocialNetwork -- "2..*" Agent: connects
 ```
 ## Core Modules
