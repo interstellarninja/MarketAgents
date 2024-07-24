@@ -166,6 +166,178 @@ The Information Board allows for the study of how information flow affects marke
 ### Social Network Graph
 The social network component in the MarketAgents framework models the interconnections and relationships between agents in the simulated economy. It plays a crucial role in capturing the effects of social interactions, information diffusion, and network externalities on market dynamics. The social network influences how information spreads, how agents form opinions, and how they make economic decisions based on their connections.
 
+# Design and Implementation
+```mermaid
+classDiagram
+    class MicroeconomicSystem {
+        +environment: Environment
+        +institution: Institution
+        +run_simulation()
+        +generate_reports()
+    }
+    class Environment {
+        +agents: List[Agent]
+        +commodities: List[Commodity]
+        +time: int
+        +social_network: SocialNetwork
+        +information_board: InformationBoard
+        +market_mechanism: DoubleAuction
+    }
+    class Institution {
+        +language: Language
+        +allocation_rules: AllocationRules
+        +cost_imputation_rules: CostImputationRules
+        +adjustment_process_rules: AdjustmentProcessRules
+        +policy_rate: float
+        +taxation_policy: float
+        +business_regulation_index: float
+        +social_security_index: float
+    }
+    class Agent {
+        +id: int
+        +utility_function: Function
+        +endowment: Dict[Commodity, float]
+        +rationality_coefficient: float
+        +epsilon: float
+        +memory: MarketMemory
+        +send_message(message: ACLMessage)
+        +receive_message(message: ACLMessage)
+        +make_decision()
+        +update_strategy()
+        +learn_from_experience()
+        +adapt_strategy()
+    }
+    class SocialNetwork {
+        +graph: Graph
+        +add_agent(agent: Agent)
+        +remove_agent(agent: Agent)
+        +add_connection(agent1: Agent, agent2: Agent)
+        +remove_connection(agent1: Agent, agent2: Agent)
+        +get_neighbors(agent: Agent): List[Agent]
+        +calculate_centrality()
+        +update_network()
+    }
+    class Buyer {
+        +induced_value: float
+        +income: float
+        +demographic_characteristics: Dict
+        +generate_bid(): ACLMessage
+        +calculate_utility(): float
+    }
+    class Seller {
+        +induced_cost: float
+        +production_function: Function
+        +capital: float
+        +specialization: str
+        +pricing_strategy: PricingStrategy
+        +generate_ask(): ACLMessage
+        +optimize_production(): float
+    }
+    class Commodity {
+        +id: int
+        +name: str
+        +category: str
+        +subcategory: str
+    }
+    class ACLMessage {
+        +performative: str
+        +sender: Agent
+        +receiver: Agent
+        +content: Expression
+        +reply_with: str
+        +in_reply_to: str
+        +language: str
+        +ontology: str
+        +protocol: str
+        +conversation_id: str
+    }
+    class Language {
+        +valid_messages: List[str]
+    }
+    class AllocationRules {
+        +determine_allocation(bids: List[ACLMessage], asks: List[ACLMessage]): List[Trade]
+    }
+    class CostImputationRules {
+        +calculate_costs(trades: List[Trade])
+    }
+    class AdjustmentProcessRules {
+        +start_rule()
+        +transition_rule()
+        +stopping_rule()
+    }
+    class DoubleAuction {
+        +buyers: List[Buyer]
+        +sellers: List[Seller]
+        +order_book: OrderBook
+        +trades: List[Trade]
+        +start_auction()
+        +end_auction()
+        +process_message(message: ACLMessage)
+        +match_orders()
+        +clear_market()
+        +broadcast_market_update()
+    }
+    class OrderBook {
+        +bids: List[ACLMessage]
+        +asks: List[ACLMessage]
+        +add_order(order: ACLMessage)
+        +remove_order(order: ACLMessage)
+        +get_best_bid(): ACLMessage
+        +get_best_ask(): ACLMessage
+        +update_order_book()
+    }
+    class Trade {
+        +buyer: Buyer
+        +seller: Seller
+        +commodity: Commodity
+        +price: float
+        +quantity: int
+        +timestamp: datetime
+    }
+    class MarketMemory {
+        +price_history: Dict[Commodity, List[float]]
+        +trade_history: List[Trade]
+        +agent_behavior: Dict[Agent, List[ACLMessage]]
+        +market_trends: Dict[Commodity, str]
+        +add_price(commodity: Commodity, price: float)
+        +add_trade(trade: Trade)
+        +add_agent_behavior(agent: Agent, message: ACLMessage)
+        +update_market_trends()
+        +get_relevant_market_data(context: str): Dict
+        +log_trade(trade: Trade)
+    }
+    class InformationBoard {
+        +posts: List[ACLMessage]
+        +add_post(post: ACLMessage)
+        +get_relevant_posts(agent: Agent): List[ACLMessage]
+        +retrieve_information(): List[str]
+    }
+    MicroeconomicSystem *-- Environment
+    MicroeconomicSystem *-- Institution
+    Environment *-- "1..*" Agent
+    Environment *-- "1..*" Commodity
+    Environment *-- InformationBoard
+    Environment *-- DoubleAuction
+    Environment *-- SocialNetwork
+    Agent <|-- Buyer
+    Agent <|-- Seller
+    Agent -- ACLMessage
+    Agent *-- MarketMemory
+    Institution *-- Language
+    Institution *-- AllocationRules
+    Institution *-- CostImputationRules
+    Institution *-- AdjustmentProcessRules
+    DoubleAuction *-- OrderBook
+    DoubleAuction *-- "0..*" Trade
+    DoubleAuction -- AllocationRules
+    Trade -- Commodity
+    InformationBoard *-- "0..*" ACLMessage
+    Agent -- InformationBoard: interacts
+    DoubleAuction -- ACLMessage: processes
+    MarketMemory -- Trade: logs
+    MarketMemory -- Commodity: tracks
+    SocialNetwork -- "2..*" Agent: connects
+```
 ## Core Modules
 
 ### MicroeconomicSystem
@@ -389,175 +561,3 @@ Key Attributes:
 - `price`: float
 - `quantity`: int
 - `timestamp`: datetime
-
-```mermaid
-classDiagram
-    class MicroeconomicSystem {
-        +environment: Environment
-        +institution: Institution
-        +run_simulation()
-        +generate_reports()
-    }
-    class Environment {
-        +agents: List[Agent]
-        +commodities: List[Commodity]
-        +time: int
-        +social_network: SocialNetwork
-        +information_board: InformationBoard
-        +market_mechanism: DoubleAuction
-    }
-    class Institution {
-        +language: Language
-        +allocation_rules: AllocationRules
-        +cost_imputation_rules: CostImputationRules
-        +adjustment_process_rules: AdjustmentProcessRules
-        +policy_rate: float
-        +taxation_policy: float
-        +business_regulation_index: float
-        +social_security_index: float
-    }
-    class Agent {
-        +id: int
-        +utility_function: Function
-        +endowment: Dict[Commodity, float]
-        +rationality_coefficient: float
-        +epsilon: float
-        +memory: MarketMemory
-        +send_message(message: ACLMessage)
-        +receive_message(message: ACLMessage)
-        +make_decision()
-        +update_strategy()
-        +learn_from_experience()
-        +adapt_strategy()
-    }
-    class SocialNetwork {
-        +graph: Graph
-        +add_agent(agent: Agent)
-        +remove_agent(agent: Agent)
-        +add_connection(agent1: Agent, agent2: Agent)
-        +remove_connection(agent1: Agent, agent2: Agent)
-        +get_neighbors(agent: Agent): List[Agent]
-        +calculate_centrality()
-        +update_network()
-    }
-    class Buyer {
-        +induced_value: float
-        +income: float
-        +demographic_characteristics: Dict
-        +generate_bid(): ACLMessage
-        +calculate_utility(): float
-    }
-    class Seller {
-        +induced_cost: float
-        +production_function: Function
-        +capital: float
-        +specialization: str
-        +pricing_strategy: PricingStrategy
-        +generate_ask(): ACLMessage
-        +optimize_production(): float
-    }
-    class Commodity {
-        +id: int
-        +name: str
-        +category: str
-        +subcategory: str
-    }
-    class ACLMessage {
-        +performative: str
-        +sender: Agent
-        +receiver: Agent
-        +content: Expression
-        +reply_with: str
-        +in_reply_to: str
-        +language: str
-        +ontology: str
-        +protocol: str
-        +conversation_id: str
-    }
-    class Language {
-        +valid_messages: List[str]
-    }
-    class AllocationRules {
-        +determine_allocation(bids: List[ACLMessage], asks: List[ACLMessage]): List[Trade]
-    }
-    class CostImputationRules {
-        +calculate_costs(trades: List[Trade])
-    }
-    class AdjustmentProcessRules {
-        +start_rule()
-        +transition_rule()
-        +stopping_rule()
-    }
-    class DoubleAuction {
-        +buyers: List[Buyer]
-        +sellers: List[Seller]
-        +order_book: OrderBook
-        +trades: List[Trade]
-        +start_auction()
-        +end_auction()
-        +process_message(message: ACLMessage)
-        +match_orders()
-        +clear_market()
-        +broadcast_market_update()
-    }
-    class OrderBook {
-        +bids: List[ACLMessage]
-        +asks: List[ACLMessage]
-        +add_order(order: ACLMessage)
-        +remove_order(order: ACLMessage)
-        +get_best_bid(): ACLMessage
-        +get_best_ask(): ACLMessage
-        +update_order_book()
-    }
-    class Trade {
-        +buyer: Buyer
-        +seller: Seller
-        +commodity: Commodity
-        +price: float
-        +quantity: int
-        +timestamp: datetime
-    }
-    class MarketMemory {
-        +price_history: Dict[Commodity, List[float]]
-        +trade_history: List[Trade]
-        +agent_behavior: Dict[Agent, List[ACLMessage]]
-        +market_trends: Dict[Commodity, str]
-        +add_price(commodity: Commodity, price: float)
-        +add_trade(trade: Trade)
-        +add_agent_behavior(agent: Agent, message: ACLMessage)
-        +update_market_trends()
-        +get_relevant_market_data(context: str): Dict
-        +log_trade(trade: Trade)
-    }
-    class InformationBoard {
-        +posts: List[ACLMessage]
-        +add_post(post: ACLMessage)
-        +get_relevant_posts(agent: Agent): List[ACLMessage]
-        +retrieve_information(): List[str]
-    }
-    MicroeconomicSystem *-- Environment
-    MicroeconomicSystem *-- Institution
-    Environment *-- "1..*" Agent
-    Environment *-- "1..*" Commodity
-    Environment *-- InformationBoard
-    Environment *-- DoubleAuction
-    Environment *-- SocialNetwork
-    Agent <|-- Buyer
-    Agent <|-- Seller
-    Agent -- ACLMessage
-    Agent *-- MarketMemory
-    Institution *-- Language
-    Institution *-- AllocationRules
-    Institution *-- CostImputationRules
-    Institution *-- AdjustmentProcessRules
-    DoubleAuction *-- OrderBook
-    DoubleAuction *-- "0..*" Trade
-    DoubleAuction -- AllocationRules
-    Trade -- Commodity
-    InformationBoard *-- "0..*" ACLMessage
-    Agent -- InformationBoard: interacts
-    DoubleAuction -- ACLMessage: processes
-    MarketMemory -- Trade: logs
-    MarketMemory -- Commodity: tracks
-    SocialNetwork -- "2..*" Agent: connects
-```
