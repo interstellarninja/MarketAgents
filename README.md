@@ -15,11 +15,83 @@ We anchor our simulation environment to the theoretical framework for modeling h
 
 A microeconomic system is a framework for modeling economic interactions between agents. It consists of two main components: an environment and an institution. The environment defines the characteristics of the economic agents, including their preferences, endowments, and technologies. The institution specifies the rules governing how agents can communicate and exchange goods or services. This framework allows economists to study how different environmental conditions and institutional rules impact economic outcomes and agent behavior.
 
+```
+classDiagram
+    class Environment {
+        +agents: List[Agent]
+        +commodities: List[Commodity]
+        +time: int
+        +social_network: SocialNetwork
+        +information_board: InformationBoard
+        +market_mechanism: DoubleAuction
+    }
+    class Agent {
+        +id: int
+        +utility_function: Function
+        +endowment: Dict[Commodity, float]
+        +rationality_coefficient: float
+        +epsilon: float
+        +memory: MarketMemory
+        +send_message(message: ACLMessage)
+        +receive_message(message: ACLMessage)
+        +make_decision()
+        +update_strategy()
+        +learn_from_experience()
+        +adapt_strategy()
+    }
+    class Institution {
+        +language: Language
+        +allocation_rules: AllocationRules
+        +cost_imputation_rules: CostImputationRules
+        +adjustment_process_rules: AdjustmentProcessRules
+        +policy_rate: float
+        +taxation_policy: float
+        +business_regulation_index: float
+        +social_security_index: float
+    }
+    class SocialNetwork {
+        +graph: Graph
+        +add_agent(agent: Agent)
+        +remove_agent(agent: Agent)
+        +add_connection(agent1: Agent, agent2: Agent)
+        +remove_connection(agent1: Agent, agent2: Agent)
+        +get_neighbors(agent: Agent): List[Agent]
+        +calculate_centrality()
+        +update_network()
+    }
+    class InformationBoard {
+        +posts: List[ACLMessage]
+        +add_post(post: ACLMessage)
+        +get_relevant_posts(agent: Agent): List[ACLMessage]
+        +retrieve_information(): List[str]
+    }
+    class DoubleAuction {
+        +buyers: List[Buyer]
+        +sellers: List[Seller]
+        +order_book: OrderBook
+        +trades: List[Trade]
+        +start_auction()
+        +end_auction()
+        +process_message(message: ACLMessage)
+        +match_orders()
+        +clear_market()
+        +broadcast_market_update()
+    }
 
+    Environment *-- "1..*" Agent
+    Environment *-- SocialNetwork
+    Environment *-- InformationBoard
+    Environment *-- DoubleAuction
+    Environment -- Institution
+    Agent -- SocialNetwork: interacts
+    Agent -- InformationBoard: interacts
+    Agent -- DoubleAuction: participates
+    Institution -- Agent: influences
+    Institution -- DoubleAuction: regulates
+```
 ## Double Auction
 
 Double auctions are a specific type of microeconomic system commonly used in experimental economics and financial markets. In a double auction, buyers and sellers can simultaneously submit bids and offers for a single type of good. The environment typically consists of separate buyer and seller populations, each with their own induced values or costs for the good. The institutional rules allow participants to freely announce bids and offers, with trades occurring when a bid meets or exceeds an offer. This structure facilitates price discovery and efficient allocation of resources, making double auctions a powerful tool for studying market dynamics and testing economic theories.
-
 
 | Proposition | Description |
 |-------------|-------------|
@@ -37,7 +109,7 @@ The table above summarizes key propositions from Vernon Smith's experimental stu
 
 ## Agents
 
-n our simulation, we implement three distinct types of agents, each representing a different level of sophistication in decision-making and information processing. This approach allows us to compare market outcomes across a spectrum of agent capabilities, from the simplest random behavior to complex, language-model-driven strategies. By doing so, we can investigate how different degrees of agent intelligence and information processing affect market efficiency, price discovery, and the replication of empirical findings from human experiments. The three agent types are designed to capture key aspects of economic decision-making, from baseline random behavior to sophisticated, human-like reasoning.
+In our simulation, we implement three distinct types of agents, each representing a different level of sophistication in decision-making and information processing. This approach allows us to compare market outcomes across a spectrum of agent capabilities, from the simplest random behavior to complex, language-model-driven strategies. By doing so, we can investigate how different degrees of agent intelligence and information processing affect market efficiency, price discovery, and the replication of empirical findings from human experiments. The three agent types are designed to capture key aspects of economic decision-making, from baseline random behavior to sophisticated, human-like reasoning.
 
 ### Zero Intelligence Agents
 
@@ -50,6 +122,20 @@ Lookback Bayesian agents introduce a level of strategic reasoning based on histo
 ### LLM Agents
 
 Large Language Model (LLM) agents represent the cutting edge in agent-based modeling for economic simulations. These agents leverage the power of language models to process complex information, learn in context, and make nuanced decisions. LLM agents can read and generate human-like messages, allowing for rich information exchange beyond simple price signals. Their working memory and history window can be adjusted to model different levels of bounded rationality. By controlling compression and summarization levels, we can simulate varying degrees of information processing capabilities. LLM agents can potentially exhibit sophisticated behaviors such as strategic communication, complex reasoning about market conditions, and adaptive learning that more closely resembles human decision-making in real markets.
+
+## Institution
+
+The `Institution` class represents the rules, norms, and structures that govern the economic system in the simulation. It encompasses various aspects of the economic environment that influence agent behavior and market dynamics.
+
+Institution defines the "rules of the game" under which agents interact and markets operate. They encompass formal rules (like laws and regulations) and informal norms that shape economic behavior. In the context of double auctions and agent-based modeling, institutions determine critical aspects such as:
+
+1. The language or protocol agents use to communicate bids, asks, and other market information.
+2. Rules for allocating resources or matching buyers and sellers.
+3. Cost structures and how they are imputed to different market participants.
+4. Processes for market clearing and price adjustment.
+5. Broader economic policies like interest rates, taxation, and business regulations.
+
+By modifying institutional parameters, researchers can simulate different market structures, regulatory environments, and policy regimes, allowing for the study of their impacts on market efficiency, price discovery, and agent behavior. This flexibility makes the Institution class a powerful tool for exploring how different rules and norms affect market outcomes in various economic scenarios.
 
 # ACL Message Protocol in Multi-Agent Economic Simulation
 
