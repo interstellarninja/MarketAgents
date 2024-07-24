@@ -77,8 +77,15 @@ classDiagram
         +clear_market()
         +broadcast_market_update()
     }
+    class Commodity {
+        +id: int
+        +name: str
+        +category: str
+        +subcategory: str
+    }
 
     Environment *-- "1..*" Agent
+    Environment *-- "1..*" Commodity
     Environment *-- SocialNetwork
     Environment *-- InformationBoard
     Environment *-- DoubleAuction
@@ -86,8 +93,10 @@ classDiagram
     Agent -- SocialNetwork: interacts
     Agent -- InformationBoard: interacts
     Agent -- DoubleAuction: participates
+    Agent -- "0..*" Commodity: owns/trades
     Institution -- Agent: influences
     Institution -- DoubleAuction: regulates
+    DoubleAuction -- Commodity: trades
 ```
 ## Double Auction
 
@@ -135,7 +144,22 @@ Institution defines the "rules of the game" under which agents interact and mark
 4. Processes for market clearing and price adjustment.
 5. Broader economic policies like interest rates, taxation, and business regulations.
 
-By modifying institutional parameters, researchers can simulate different market structures, regulatory environments, and policy regimes, allowing for the study of their impacts on market efficiency, price discovery, and agent behavior. This flexibility makes the Institution class a powerful tool for exploring how different rules and norms affect market outcomes in various economic scenarios.
+By modifying institutional parameters, we can simulate different market structures, regulatory environments, and policy regimes, allowing for the study of their impacts on market efficiency, price discovery, and agent behavior. This flexibility makes the Institution class a powerful tool for exploring how different rules and norms affect market outcomes in various economic scenarios.
+
+## Commodity
+
+The `Commodity` class represents the goods and services that are traded within the microeconomic system. It is a fundamental component of the economic environment, serving as the objects of exchange between agents in the market.
+
+Commodities in the microeconomic system simulation represent the various goods and services that agents can produce, consume, or trade. They are central to the economic interactions, forming the basis for supply and demand dynamics. In the context of double auctions and agent-based modeling, commodities are the items being bought and sold, with their characteristics influencing agent decisions and market outcomes.
+
+The Commodity class plays a crucial role in the simulation by:
+
+1. Defining the objects of trade in the market.
+2. Allowing for the creation of diverse and complex economic environments with multiple types of goods.
+3. Enabling the study of how different commodity characteristics affect market dynamics and agent behavior.
+4. Facilitating the implementation of realistic economic scenarios with varied product markets.
+
+By manipulating the properties and availability of commodities, we can simulate different market conditions, scarcity scenarios, and product innovations, providing a rich environment for economic experimentation and analysis.
 
 # ACL Message Protocol in Multi-Agent Economic Simulation
 
