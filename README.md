@@ -508,7 +508,7 @@ Key Methods:
 - `get_relevant_posts(agent: Agent): List[ACLMessage]`
 - `retrieve_information(): List[str]`
 
-#### ocialNetwork
+#### SocialNetwork
 The SocialNetwork class represents the social structure of the agents in the simulation. It uses a graph data structure to model connections between agents and provides methods for manipulating and analyzing the network.
 
 Key Attributes:
