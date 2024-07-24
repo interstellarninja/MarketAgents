@@ -157,7 +157,7 @@ economic_indicators: Various economic indicators relevant to the market.
 ```
 
 ### Information Board
-The Information Board serves as a centralized repository for economic news and statistics, simulating the dissemination of public information within the economy. This component plays a crucial role in the Litecon framework by:
+The Information Board serves as a centralized repository for economic news and statistics, simulating the dissemination of public information within the economy. This component plays a crucial role in the MarketAgents framework by:
 
 1. Generating and distributing economic news based on current market states and exogenous factors.
 2. Implementing information dissemination mechanisms with variable reach and impact.
