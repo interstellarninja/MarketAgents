@@ -24,6 +24,7 @@ classDiagram
         +social_network: SocialNetwork
         +information_board: InformationBoard
         +market_mechanism: DoubleAuction
+        +database: SimulationDatabase
     }
     class Agent {
         +id: int
@@ -31,7 +32,7 @@ classDiagram
         +endowment: Dict[Commodity, float]
         +rationality_coefficient: float
         +epsilon: float
-        +memory: MarketMemory
+        +memory: AgentMemory
         +send_message(message: ACLMessage)
         +receive_message(message: ACLMessage)
         +make_decision()
@@ -58,6 +59,15 @@ classDiagram
         +get_neighbors(agent: Agent): List[Agent]
         +calculate_centrality()
         +update_network()
+    }
+    class SimulationDatabase {
+        +market_history: MarketHistory
+        +agent_memories: Dict[int, AgentMemory]
+        +add_market_data(data: Dict)
+        +add_agent_memory(agent_id: int, memory: Dict)
+        +get_market_data(time_range: Tuple[int, int]): List[Dict]
+        +get_agent_memory(agent_id: int, memory_type: str): Dict
+        +update_agent_memory(agent_id: int, memory_type: str, data: Dict)
     }
     class InformationBoard {
         +posts: List[ACLMessage]
@@ -88,10 +98,12 @@ classDiagram
     Environment *-- "1..*" Commodity
     Environment *-- SocialNetwork
     Environment *-- InformationBoard
+    Environment *-- SimulationDatabase
     Environment *-- DoubleAuction
     Environment -- Institution
     Agent -- SocialNetwork: interacts
     Agent -- InformationBoard: interacts
+    Agent -- SimulationDatabase: interacts
     Agent -- DoubleAuction: participates
     Agent -- "0..*" Commodity: owns/trades
     Institution -- Agent: influences
@@ -298,6 +310,8 @@ In a Double Auction framework, ACL messages facilitate various market interactio
 
 ## CONTEXT MEMORIES FOR PIPING INTO AGENT PROMPTS
 
+The Context Memory Framework is a crucial component of the agent-based economic simulation, providing agents with a structured way to store, retrieve, and utilize information from their experiences and observations. This framework enables more realistic and nuanced agent behavior by allowing them to learn from past experiences and adapt to changing market conditions.
+
 Depending on the resolution the agents need, we should use a fast indexed search for fast recall of distant memories.
 
 ### Agent Context Memory:
@@ -359,6 +373,29 @@ The Information Board allows for the study of how information flow affects marke
 ### Social Network Graph
 The social network component in the MarketAgents framework models the interconnections and relationships between agents in the simulated economy. It plays a crucial role in capturing the effects of social interactions, information diffusion, and network externalities on market dynamics. The social network influences how information spreads, how agents form opinions, and how they make economic decisions based on their connections.
 
+### Market History
+The Market History component serves as a comprehensive repository of all market-related data over time. It plays a crucial role in the MarketAgents framework by:
+
+1. Recording and maintaining historical price data for all commodities traded in the market.
+2. Tracking all trades that have occurred, including details such as parties involved, quantities, and prices.
+3. Storing global economic indicators and market trends over time.
+4. Providing efficient methods for querying and analyzing historical market data.
+5. Supporting the calculation of various market metrics and performance indicators.
+
+The Market History allows for in-depth analysis of market dynamics, enables the study of long-term trends, and provides agents with a rich dataset for informing their decision-making processes.
+
+### Simulation Database
+The Simulation Database acts as the central data management system for the entire economic simulation. It integrates various data components, including Market History and agent memories. Key aspects of the Simulation Database include:
+
+1. Providing a unified interface for data storage and retrieval across all simulation components.
+2. Managing both market-wide historical data and individual agent memories efficiently.
+3. Supporting complex queries that can span across different data types and time periods.
+4. Enabling data persistence and recovery, allowing simulations to be paused, resumed, or replayed.
+5. Facilitating the implementation of learning algorithms and adaptive strategies by providing easy access to historical data.
+6. Supporting the generation of comprehensive reports and visualizations for analysis.
+
+The Simulation Database enhances the overall performance and capabilities of the simulation by centralizing data management, thereby allowing for more sophisticated agent behaviors, market analyses, and experimental scenarios.
+
 # Design and Implementation
 ```mermaid
 classDiagram
@@ -375,6 +412,7 @@ classDiagram
         +social_network: SocialNetwork
         +information_board: InformationBoard
         +market_mechanism: DoubleAuction
+        +database: SimulationDatabase
     }
     class Institution {
         +language: Language
@@ -392,13 +430,24 @@ classDiagram
         +endowment: Dict[Commodity, float]
         +rationality_coefficient: float
         +epsilon: float
-        +memory: MarketMemory
+        +memory: AgentMemory
         +send_message(message: ACLMessage)
         +receive_message(message: ACLMessage)
         +make_decision()
         +update_strategy()
         +learn_from_experience()
         +adapt_strategy()
+    }
+    class AgentMemory {
+        +inner_monologue: List[str]
+        +finance_history: List[Dict]
+        +social_history: List[Dict]
+        +activity_log: List[Dict]
+        +add_inner_monologue(thought: str)
+        +add_finance_event(event: Dict)
+        +add_social_interaction(interaction: Dict)
+        +add_activity(activity: Dict)
+        +get_memory(memory_type: str, time_range: Tuple[int, int]): List
     }
     class SocialNetwork {
         +graph: Graph
@@ -409,6 +458,15 @@ classDiagram
         +get_neighbors(agent: Agent): List[Agent]
         +calculate_centrality()
         +update_network()
+    }
+    class SimulationDatabase {
+        +market_history: MarketHistory
+        +agent_memories: Dict[int, AgentMemory]
+        +add_market_data(data: Dict)
+        +add_agent_memory(agent_id: int, memory: Dict)
+        +get_market_data(time_range: Tuple[int, int]): List[Dict]
+        +get_agent_memory(agent_id: int, memory_type: str): Dict
+        +update_agent_memory(agent_id: int, memory_type: str, data: Dict)
     }
     class Buyer {
         +induced_value: float
@@ -487,17 +545,16 @@ classDiagram
         +quantity: int
         +timestamp: datetime
     }
-    class MarketMemory {
-        +price_history: Dict[Commodity, List[float]]
+    class MarketHistory {
+        +price_history: Dict[int, Dict[int, float]]
         +trade_history: List[Trade]
-        +agent_behavior: Dict[Agent, List[ACLMessage]]
-        +market_trends: Dict[Commodity, str]
-        +add_price(commodity: Commodity, price: float)
+        +global_indicators: Dict[str, List[float]]
+        +add_price(commodity_id: int, time: int, price: float)
         +add_trade(trade: Trade)
-        +add_agent_behavior(agent: Agent, message: ACLMessage)
-        +update_market_trends()
-        +get_relevant_market_data(context: str): Dict
-        +log_trade(trade: Trade)
+        +update_indicators(indicators: Dict[str, float])
+        +get_price_history(commodity_id: int, time_range: Tuple[int, int]): List[float]
+        +get_trades(time_range: Tuple[int, int]): List[Trade]
+        +get_indicators(indicator: str, time_range: Tuple[int, int]): List[float]
     }
     class InformationBoard {
         +posts: List[ACLMessage]
@@ -673,22 +730,51 @@ Key Attributes:
 
 ### Data Collection and Analysis
 
-#### MarketMemory
-The MarketMemory class maintains historical records of market activities.
+#### SimulationDatabase
+The SimulationDatabase class serves as the central repository for all historical data in the simulation, including market-wide information and individual agent memories.
 
 Key Attributes:
-- `price_history`: Dict[Commodity, List[float]]
-- `trade_history`: List[Trade]
-- `agent_behavior`: Dict[Agent, List[ACLMessage]]
-- `market_trends`: Dict[Commodity, str]
+- `market_history`: MarketHistory
+- `agent_memories`: Dict[int, AgentMemory]
 
 Key Methods:
-- `add_price(commodity: Commodity, price: float)`
+- `add_market_data(data: Dict)`
+- `add_agent_memory(agent_id: int, memory: Dict)`
+- `get_market_data(time_range: Tuple[int, int]): List[Dict]`
+- `get_agent_memory(agent_id: int, memory_type: str): Dict`
+- `update_agent_memory(agent_id: int, memory_type: str, data: Dict)`
+
+#### MarketHistory
+The MarketHistory class maintains comprehensive records of market-wide activities and economic indicators over time.
+
+Key Attributes:
+- `price_history`: Dict[int, Dict[int, float]]
+- `trade_history`: List[Trade]
+- `global_indicators`: Dict[str, List[float]]
+
+Key Methods:
+- `add_price(commodity_id: int, time: int, price: float)`
 - `add_trade(trade: Trade)`
-- `add_agent_behavior(agent: Agent, message: ACLMessage)`
-- `update_market_trends()`
-- `get_relevant_market_data(context: str): Dict`
-- `log_trade(trade: Trade)`
+- `update_indicators(indicators: Dict[str, float])`
+- `get_price_history(commodity_id: int, time_range: Tuple[int, int]): List[float]`
+- `get_trades(time_range: Tuple[int, int]): List[Trade]`
+- `get_indicators(indicator: str, time_range: Tuple[int, int]): List[float]`
+
+#### AgentMemory
+The AgentMemory class represents an individual agent's memory, storing various types of experiences and observations.
+
+Key Attributes:
+- `inner_monologue`: List[str]
+- `finance_history`: List[Dict]
+- `social_history`: List[Dict]
+- `activity_log`: List[Dict]
+
+Key Methods:
+- `add_inner_monologue(thought: str)`
+- `add_finance_event(event: Dict)`
+- `add_social_interaction(interaction: Dict)`
+- `add_activity(activity: Dict)`
+- `get_memory(memory_type: str, time_range: Tuple[int, int]): List`
 
 #### InformationBoard
 The InformationBoard class serves as a centralized repository for economic news and statistics.
