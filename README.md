@@ -847,3 +847,20 @@ Key Attributes:
 - `price`: float
 - `quantity`: int
 - `timestamp`: datetime
+
+### Distributed inferencing
+
+Depending on the underlying LLM models that would pilot the Agents, if using a model by self-hosting or manage manually the infrastructure, a distributed inference strategy and framework might have to be chosen, for instance:
+
+- If the model is too large for single-nodes, the inferencing would need to be distributed between several nodes with multiple GPUs
+- If the model size fits multiple GPU-cards in a single-host, distributed inferencing and tensor split could be done locally on the same machine
+- If the model size fits single GPU-cards, we can rely on distributing the inference and load-balancing requests between different nodes.
+
+Given the high load and speed required by the agent model to simulate a population, it is required at least to load-balance requests across multiple instances. A benchmarking phase would be appropriate to understand the infrastructure requirements based on the simulation size.
+
+Projects that supports distributed inference are:
+
+- vLLM ( https://docs.vllm.ai/en/latest/serving/distributed_serving.html#multi-node-inference-and-serving )
+- LocalAI ( https://localai.io/features/distribute/ )
+
+To note, the frameworks needs to implement an API that allows to use functions calls, tools, or similar requirements (e.g. by using BNF grammars) to allow model the operations of the Agents.
