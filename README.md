@@ -858,6 +858,10 @@ Depending on the underlying LLM models that would pilot the Agents, if using a m
 
 Given the high load and speed required by the agent model to simulate a population, it is required at least to load-balance requests across multiple instances. A benchmarking phase would be appropriate to understand the infrastructure requirements based on the simulation size.
 
+Load balancing can be achieved by using container orchestration frameworks such as Kubernetes, or by using a custom load balancer that distributes requests based on the load of each node (for instance, HAProxy, nginx, and similar), alternatively, we can explore a more specific Load Balancing strategy which is more tight to the inferencing engine that is used (for example by looking at the node's free batch queues, and which ones are currently busy in inferencing and have no free slots).
+
+The choice of the framework depends on the specific requirements of the simulation and the available infrastructure, as well as the desired level of automation and scalability that will be evaluated after an initial benchmarking phase.
+
 Projects that supports distributed inference are:
 
 - vLLM ( https://docs.vllm.ai/en/latest/serving/distributed_serving.html#multi-node-inference-and-serving )
