@@ -862,7 +862,7 @@ Load balancing can be achieved by using container orchestration frameworks such 
 
 The choice of the framework depends on the specific requirements of the simulation and the available infrastructure, as well as the desired level of automation and scalability that will be evaluated after an initial benchmarking phase.
 
-Projects that supports distributed inference are:
+Projects that supports distributed inference and fullfill the requirements above are (not exhaustive list):
 
 - vLLM ( https://docs.vllm.ai/en/latest/serving/distributed_serving.html#multi-node-inference-and-serving )
 - LocalAI ( https://localai.io/features/distribute/ )
