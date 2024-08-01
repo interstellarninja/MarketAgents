@@ -783,15 +783,25 @@ Key Methods:
 - `add_activity(activity: Dict)`
 - `get_memory(memory_type: str, time_range: Tuple[int, int]): List`
 
+#### BoardMessage
+
+Tha BoardMessage class is a wrapper around ACLMessage for ease of use in the InformationBoard.
+
+Key Attributes:
+
+- `message`: ACLMessage
+- `date_posted`: datetime
+- `title`: Optional[str]
+
 #### InformationBoard
 The InformationBoard class serves as a centralized repository for economic news and statistics.
 
 Key Attributes:
-- `posts`: List[ACLMessage]
+- `posts`: List[BoardMessage]
 
 Key Methods:
-- `add_post(post: ACLMessage)`
-- `get_relevant_posts(agent: Agent): List[ACLMessage]`
+- `add_post(post: BoardMessage)`
+- `get_relevant_posts(relevant_topics: List[str]): List[BoardMessage]`
 - `retrieve_information(): List[str]`
 
 #### SocialNetwork
