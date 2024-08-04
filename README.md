@@ -29,6 +29,7 @@ classDiagram
         +information_board: InformationBoard
         +market_mechanism: DoubleAuction
         +database: SimulationDatabase
+        +group_message: GroupMessage
     }
     class Agent {
         +id: int
@@ -43,6 +44,7 @@ classDiagram
         +update_strategy()
         +learn_from_experience()
         +adapt_strategy()
+        +generate_message(group: GroupMessage): str
     }
     class Institution {
         +language: Language
@@ -97,6 +99,18 @@ classDiagram
         +category: str
         +subcategory: str
     }
+    class GroupMessage {
+        +agents: List[Agent]
+        +messages: List[Dict]
+        +max_round: int
+        +admin_name: str
+        +speaker_selection_method: Union[str, Callable]
+        +allow_repeat_speaker: bool
+        +add_message(sender: Agent, content: str)
+        +get_next_speaker(last_speaker: Agent): Agent
+        +run_conversation()
+        +check_termination_condition(): bool
+    }
 
     Environment *-- "1..*" Agent
     Environment *-- "1..*" Commodity
@@ -104,15 +118,18 @@ classDiagram
     Environment *-- InformationBoard
     Environment *-- SimulationDatabase
     Environment *-- DoubleAuction
+    Environment *-- GroupMessage
     Environment -- Institution
     Agent -- SocialNetwork: interacts
     Agent -- InformationBoard: interacts
     Agent -- SimulationDatabase: interacts
     Agent -- DoubleAuction: participates
     Agent -- "0..*" Commodity: owns/trades
+    Agent -- GroupMessage: participates
     Institution -- Agent: influences
     Institution -- DoubleAuction: regulates
     DoubleAuction -- Commodity: trades
+    GroupMessage -- "2..*" Agent: includes
 ```
 ## Double Auction
 
@@ -364,6 +381,29 @@ Has two memory tracks their previous observations and the holistic market overvi
 - `institution_changes: Record of changes to market institutions and their impacts`
 - `global_supply_demand: Supply and demand information for each commodity`
 - `economic_indicators: Various economic indicators relevant to the market`
+
+### Group Message Module
+
+The Group Message module introduces a new dimension of agent interaction to our multi-agent market simulation framework. This feature allows for group-based communication using the Agent Communication Language (ACL) protocol, enabling agents to engage in standardized collective discussions, share market insights, and influence each other's beliefs and strategies.
+
+#### Key Features
+
+- **ACL-Based Communication**: Utilize standardized ACL messages for group discussions, allowing for more nuanced and expressive communication.
+- **Dynamic Group Conversations**: Facilitate multi-agent dialogues with configurable parameters such as maximum rounds and speaker selection methods.
+- **Flexible Speaker Selection**: Choose from various methods to determine the next speaker, including automatic, manual, random, and round-robin selection.
+- **Customizable Conversation Flow**: Set rules for speaker repetition and implement custom termination conditions for group discussions.
+- **Integration with Agent Decision-Making**: ACL group messages can influence agent beliefs, strategies, and market behaviors, leading to more realistic market dynamics.
+- **Conversation Tracking**: Unique conversation IDs allow for better organization and analysis of group discussions.
+
+#### Usage
+
+To use the ACL-based Group Message module in your simulation:
+
+1. Initialize a `GroupMessage` instance within your `Environment`.
+2. Implement the `generate_group_message()` method in your `Agent` class to produce ACL messages for group discussions.
+3. Implement the `receive_group_message()` method in your `Agent` class to process incoming ACL messages.
+4. Call `run_conversation()` on your `GroupMessage` instance at appropriate points in your simulation loop.
+5. Process the outcomes of group conversations to update agent states and market conditions.
 
 ### Information Board
 The Information Board serves as a centralized repository for economic news and statistics, simulating the dissemination of public information within the economy. This component plays a crucial role in the MarketAgents framework by:
