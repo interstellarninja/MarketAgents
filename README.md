@@ -457,6 +457,7 @@ classDiagram
         +information_board: InformationBoard
         +market_mechanism: DoubleAuction
         +database: SimulationDatabase
+        +group_message: GroupMessage
     }
     class Institution {
         +language: Language
@@ -601,10 +602,27 @@ classDiagram
         +get_indicators(indicator: str, time_range: Tuple[int, int]): List[float]
     }
     class InformationBoard {
-        +posts: List[ACLMessage]
-        +add_post(post: ACLMessage)
-        +get_relevant_posts(agent: Agent): List[ACLMessage]
+        +posts: List[BoardMessage]
+        +add_post(post: BoardMessage)
+        +get_relevant_posts(relevant_topics: List[str]): List[BoardMessage]
         +retrieve_information(): List[str]
+    }
+    class BoardMessage {
+        +message: ACLMessage
+        +date_posted: datetime
+        +title: Optional[str]
+    }
+    class GroupMessage {
+        +agents: List[Agent]
+        +messages: List[Dict]
+        +max_round: int
+        +admin_name: str
+        +speaker_selection_method: Union[str, Callable]
+        +allow_repeat_speaker: bool
+        +add_message(sender: Agent, content: str)
+        +get_next_speaker(last_speaker: Agent): Agent
+        +run_conversation()
+        +check_termination_condition(): bool
     }
     MicroeconomicSystem *-- Environment
     MicroeconomicSystem *-- Institution
@@ -614,6 +632,7 @@ classDiagram
     Environment *-- DoubleAuction
     Environment *-- SocialNetwork
     Environment *-- SimulationDatabase
+    Environment *-- GroupMessage
     Agent <|-- Buyer
     Agent <|-- Seller
     Agent -- ACLMessage
@@ -626,7 +645,8 @@ classDiagram
     DoubleAuction *-- "0..*" Trade
     DoubleAuction -- AllocationRules
     Trade -- Commodity
-    InformationBoard *-- "0..*" ACLMessage
+    InformationBoard *-- "0..*" BoardMessage
+    BoardMessage *-- ACLMessage
     Agent -- InformationBoard: interacts
     DoubleAuction -- ACLMessage: processes
     SimulationDatabase *-- MarketHistory
@@ -634,6 +654,7 @@ classDiagram
     MarketHistory *-- "0..*" Trade
     MarketHistory -- Commodity: tracks
     SocialNetwork -- "2..*" Agent: connects
+    GroupMessage -- "2..*" Agent: involves
 ```
 ## Core Modules
 
@@ -822,6 +843,24 @@ Key Methods:
 - `add_social_interaction(interaction: Dict)`
 - `add_activity(activity: Dict)`
 - `get_memory(memory_type: str, time_range: Tuple[int, int]): List`
+
+#### GroupMessage
+
+The GroupMessage class facilitates group discussions among agents in the simulation.
+
+Key Attributes:
+* `agents`: List[Agent] - The list of agents participating in the group discussion
+* `messages`: List[Dict] - A record of all messages sent during the conversation
+* `max_round`: int - The maximum number of rounds for the conversation
+* `admin_name`: str - The name of the administrator managing the group discussion
+* `speaker_selection_method`: Union[str, Callable] - Method for selecting the next speaker (e.g., "random", "round-robin", or a custom function)
+* `allow_repeat_speaker`: bool - Whether a speaker can speak multiple times in a row
+
+Key Methods:
+* `add_message(sender: Agent, content: str)` - Adds a new message to the conversation
+* `get_next_speaker(last_speaker: Agent): Agent` - Determines the next speaker based on the selection method
+* `run_conversation()` - Manages the flow of the group discussion
+* `check_termination_condition(): bool` - Checks if the conversation should be terminated
 
 #### BoardMessage
 
