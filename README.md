@@ -106,11 +106,14 @@ classDiagram
         +admin_name: str
         +speaker_selection_method: Union[str, Callable]
         +allow_repeat_speaker: bool
+        +debate: bool
         +add_message(sender: Agent, content: str)
         +get_next_speaker(last_speaker: Agent): Agent
         +run_conversation()
+        +run_debate()
         +check_termination_condition(): bool
     }
+
 
     Environment *-- "1..*" Agent
     Environment *-- "1..*" Commodity
@@ -388,22 +391,33 @@ The Group Message module introduces a new dimension of agent interaction to our 
 
 #### Key Features
 
-- **ACL-Based Communication**: Utilize standardized ACL messages for group discussions, allowing for more nuanced and expressive communication.
-- **Dynamic Group Conversations**: Facilitate multi-agent dialogues with configurable parameters such as maximum rounds and speaker selection methods.
-- **Flexible Speaker Selection**: Choose from various methods to determine the next speaker, including automatic, manual, random, and round-robin selection.
-- **Customizable Conversation Flow**: Set rules for speaker repetition and implement custom termination conditions for group discussions.
-- **Integration with Agent Decision-Making**: ACL group messages can influence agent beliefs, strategies, and market behaviors, leading to more realistic market dynamics.
-- **Conversation Tracking**: Unique conversation IDs allow for better organization and analysis of group discussions.
+* **ACL-Based Communication**: Utilize standardized ACL messages for group discussions, allowing for more nuanced and expressive communication.
+* **Dynamic Group Conversations**: Facilitate multi-agent dialogues with configurable parameters such as maximum rounds and speaker selection methods.
+* **Flexible Speaker Selection**: Choose from various methods to determine the next speaker, including automatic, manual, random, and round-robin selection.
+* **Customizable Conversation Flow**: Set rules for speaker repetition and implement custom termination conditions for group discussions.
+* **Integration with Agent Decision-Making**: ACL group messages can influence agent beliefs, strategies, and market behaviors, leading to more realistic market dynamics.
+* **Conversation Tracking**: Unique conversation IDs allow for better organization and analysis of group discussions.
+
+#### Debate Protocol
+
+In addition to regular discussions and gossip, the Group Message module now supports structured debates using the ACL protocol. This feature allows agents to engage in more formal and rigorous exchanges of ideas, leading to potentially more informed decision-making and market dynamics.
+
+Key aspects of the debate protocol:
+
+* **Proposition and Challenge**: Agents can propose ideas (PROPOSE performative) and challenge others' propositions (QUERY-IF or DISCONFIRM performatives).
+* **Verification**: Neutral agents can verify claims (CONFIRM or DISCONFIRM performatives), adding an element of fact-checking to debates.
+* **Structured Rounds**: Debates follow a structured format with defined roles (e.g., proposer, challenger, verifier) and round limits.
+* **Outcome Determination**: The debate concludes with a determination based on the strength of arguments and verification results.
 
 #### Usage
 
 To use the ACL-based Group Message module in your simulation:
 
 1. Initialize a `GroupMessage` instance within your `Environment`.
-2. Implement the `generate_group_message()` method in your `Agent` class to produce ACL messages for group discussions.
+2. Implement the `generate_group_message()` method in your `Agent` class to produce ACL messages for group discussions and debates.
 3. Implement the `receive_group_message()` method in your `Agent` class to process incoming ACL messages.
-4. Call `run_conversation()` on your `GroupMessage` instance at appropriate points in your simulation loop.
-5. Process the outcomes of group conversations to update agent states and market conditions.
+4. Call `run_conversation()` or `run_debate()` on your `GroupMessage` instance at appropriate points in your simulation loop.
+5. Process the outcomes of group conversations and debates to update agent states and market conditions.
 
 ### Information Board
 The Information Board serves as a centralized repository for economic news and statistics, simulating the dissemination of public information within the economy. This component plays a crucial role in the MarketAgents framework by:
@@ -619,11 +633,14 @@ classDiagram
         +admin_name: str
         +speaker_selection_method: Union[str, Callable]
         +allow_repeat_speaker: bool
+        +debate: bool
         +add_message(sender: Agent, content: str)
         +get_next_speaker(last_speaker: Agent): Agent
         +run_conversation()
+        +run_debate()
         +check_termination_condition(): bool
     }
+
     MicroeconomicSystem *-- Environment
     MicroeconomicSystem *-- Institution
     Environment *-- "1..*" Agent
@@ -846,21 +863,26 @@ Key Methods:
 
 #### GroupMessage
 
-The GroupMessage class facilitates group discussions among agents in the simulation.
+The GroupMessage class facilitates group discussions and debates among agents in the simulation.
 
 Key Attributes:
-* `agents`: List[Agent] - The list of agents participating in the group discussion
-* `messages`: List[Dict] - A record of all messages sent during the conversation
-* `max_round`: int - The maximum number of rounds for the conversation
-* `admin_name`: str - The name of the administrator managing the group discussion
-* `speaker_selection_method`: Union[str, Callable] - Method for selecting the next speaker (e.g., "random", "round-robin", or a custom function)
-* `allow_repeat_speaker`: bool - Whether a speaker can speak multiple times in a row
+
+* `agents`: List[Agent] - The list of agents participating in the group discussion or debate.
+* `messages`: List[Dict] - A record of all messages sent during the conversation.
+* `max_round`: int - The maximum number of rounds for the conversation or debate.
+* `admin_name`: str - The name of the administrator managing the group discussion or debate.
+* `speaker_selection_method`: Union[str, Callable] - Method for selecting the next speaker (e.g., "random", "round-robin", or a custom function).
+* `allow_repeat_speaker`: bool - Whether a speaker can speak multiple times in a row.
+* `debate`: bool - Indicates whether the group message instance is running a debate.
 
 Key Methods:
-* `add_message(sender: Agent, content: str)` - Adds a new message to the conversation
-* `get_next_speaker(last_speaker: Agent): Agent` - Determines the next speaker based on the selection method
-* `run_conversation()` - Manages the flow of the group discussion
-* `check_termination_condition(): bool` - Checks if the conversation should be terminated
+
+* `add_message(sender: Agent, content: str)` - Adds a new message to the conversation.
+* `get_next_speaker(last_speaker: Agent): Agent` - Determines the next speaker based on the selection method.
+* `run_conversation()` - Manages the flow of the group discussion.
+* `run_debate()` - Manages the flow of the debate.
+* `check_termination_condition(): bool` - Checks if the conversation should be terminated.
+
 
 #### BoardMessage
 
