@@ -1,0 +1,6 @@
+Flask
+eventlet
+Pydantic
+openai
+python-dotenv
+colorama
